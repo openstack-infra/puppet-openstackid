@@ -1,0 +1,23 @@
+{
+  "name": "openstackci-openstackid",
+  "version": "0.0.1",
+  "author": "Openstack CI",
+  "summary": "Puppet module for openstackid",
+  "license": "Apache 2.0",
+  "source": "git://git.openstack.org/openstack-infra/puppet-openstackid.git",
+  "project_page": "http://ci.openstack.org/",
+  "issues_url": "https://storyboard.openstack.org/#!/project/761",
+  "operatingsystem_support": [
+    { "operatingsystem": "Ubuntu", "operatingsystemrelease": ["12.04"] }
+  ],
+  "requirements": [
+    { "name": "pe", "version_requirement": ">= 3.2.0 < 3.4.0" },
+    { "name": "puppet", "version_requirement": "3.x" }
+  ],
+  "dependencies": [
+    { "name": "puppetlabs/stdlib", "version_requirement": ">= 3.2.0" },
+    { "name": "puppetlabs/mysql", "version_requirement": "= 0.6.1" },
+    { "name": "puppetlabs/apache", "version_requirement": "= 0.0.4" },
+    { "name": "openstackci/redis", "version_requirement": "= 0.0.1" }
+  ]
+}
