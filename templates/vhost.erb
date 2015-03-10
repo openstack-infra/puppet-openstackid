@@ -21,6 +21,11 @@
 
   SSLEngine on
   SSLProtocol All -SSLv2 -SSLv3
+  # Once the machine is using something to terminate TLS that supports ECDHE
+  # then this should be edited to remove the RSA+AESGCM:RSA+AES so that PFS
+  # only is guarenteed.
+  SSLCipherSuite ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:RSA+AESGCM:RSA+AES:!AES256:!aNULL:!eNULL:!MD5:!DSS:!PSK:!SRP
+  SSLHonorCipherOrder on
   SSLCertificateFile      <%= scope.lookupvar("openstackid::ssl_cert_file") %>
   SSLCertificateKeyFile   <%= scope.lookupvar("openstackid::ssl_key_file") %>
 <% if scope.lookupvar("openstackid::ssl_chain_file") != "" %>
