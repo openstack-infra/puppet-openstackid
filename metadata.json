@@ -1,5 +1,5 @@
 {
-  "name": "openstackci-openstackid",
+  "name": "openstackinfra-openstackid",
   "version": "0.0.1",
   "author": "Openstack CI",
   "summary": "Puppet module for openstackid",
@@ -18,6 +18,6 @@
     { "name": "puppetlabs/stdlib", "version_requirement": ">= 3.2.0" },
     { "name": "puppetlabs/mysql", "version_requirement": "= 0.6.1" },
     { "name": "puppetlabs/apache", "version_requirement": "= 0.0.4" },
-    { "name": "openstackci/redis", "version_requirement": "= 0.0.1" }
+    { "name": "openstackinfra/redis", "version_requirement": "= 0.0.1" }
   ]
 }
