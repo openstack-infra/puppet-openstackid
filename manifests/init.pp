@@ -155,10 +155,10 @@ class openstackid (
     mode    => '0755',
   }
 
-  include apache
-  include apache::ssl
-  include apache::php
-  apache::vhost { $vhost_name:
+  include ::httpd
+  include ::httpd::ssl
+  include ::httpd::php
+  ::httpd::vhost { $vhost_name:
     port     => 443,
     docroot  => '/srv/openstackid/w/public',
     priority => '50',
@@ -166,13 +166,13 @@ class openstackid (
     ssl      => true,
     require  => File[$docroot_dirs],
   }
-  a2mod { 'rewrite':
+  httpd_mod { 'rewrite':
     ensure => present,
   }
-  a2mod { 'proxy':
+  httpd_mod { 'proxy':
     ensure => present,
   }
-  a2mod { 'proxy_http':
+  httpd_mod { 'proxy_http':
     ensure => present,
   }
 
@@ -182,7 +182,7 @@ class openstackid (
       group   => 'root',
       mode    => '0640',
       content => $ssl_cert_file_contents,
-      before  => Apache::Vhost[$vhost_name],
+      before  => Httpd::Vhost[$vhost_name],
     }
   }
 
@@ -192,7 +192,7 @@ class openstackid (
       group   => 'root',
       mode    => '0640',
       content => $ssl_key_file_contents,
-      before  => Apache::Vhost[$vhost_name],
+      before  => Httpd::Vhost[$vhost_name],
     }
   }
 
@@ -202,7 +202,7 @@ class openstackid (
       group   => 'root',
       mode    => '0640',
       content => $ssl_chain_file_contents,
-      before  => Apache::Vhost[$vhost_name],
+      before  => Httpd::Vhost[$vhost_name],
     }
   }
 
@@ -224,7 +224,7 @@ class openstackid (
     logoutput => on_failure,
     require   => [
       File['/opt/deploy/conf.d/openstackid.conf'],
-      Apache::Vhost[$vhost_name],
+      Httpd::Vhost[$vhost_name],
       File['/etc/openstackid/recaptcha.php'],
       File['/etc/openstackid/database.php'],
       File['/etc/openstackid/log.php'],
@@ -241,7 +241,7 @@ class openstackid (
     logoutput => on_failure,
     require   => [
       File['/opt/deploy/conf.d/openstackid.conf'],
-      Apache::Vhost[$vhost_name],
+      Httpd::Vhost[$vhost_name],
       File['/etc/openstackid/recaptcha.php'],
       File['/etc/openstackid/database.php'],
       File['/etc/openstackid/log.php'],
