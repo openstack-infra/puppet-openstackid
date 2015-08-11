@@ -21,10 +21,10 @@ define openstackid::deploy (
   $deploy_dirs = [ '/opt/deploy', '/opt/deploy/conf.d' ]
 
   file { $deploy_dirs:
-    ensure  => directory,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
+    ensure => directory,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
   }
 
   file { '/opt/deploy/deploy.sh':
@@ -51,3 +51,4 @@ define openstackid::deploy (
     require => File[$deploy_dirs],
   }
 }
+

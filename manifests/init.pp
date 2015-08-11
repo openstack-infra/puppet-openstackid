@@ -149,10 +149,10 @@ class openstackid (
   $docroot_dirs = [ '/srv/openstackid' ]
 
   file { $docroot_dirs:
-    ensure  => directory,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
+    ensure => directory,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
   }
 
   include ::httpd
