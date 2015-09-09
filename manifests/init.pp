@@ -51,6 +51,7 @@ class openstackid (
   $openstackid_release = 'latest',
   $ssl_enable = true,
   $oauth2_enable = true,
+  $use_db_seeding = 0
 ) {
 
   # php packages needed for openid server
@@ -204,6 +205,16 @@ class openstackid (
       content => $ssl_chain_file_contents,
       before  => Httpd::Vhost[$vhost_name],
     }
+  }
+
+  # Ensure Mcrypt is enabled
+  exec { 'enablemcrypt':
+    path    => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/' ],
+    command => 'php5enmod mcrypt',
+    notify  => Service['apache2'],
+    require => [
+      Httpd::Vhost[$vhost_name],
+      Package[$php5_packages] ] ,
   }
 
   deploy { 'deploytool':
