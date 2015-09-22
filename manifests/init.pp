@@ -74,6 +74,22 @@ class openstackid (
     ensure => present,
   }
 
+  # add node js and npm for bower installation
+  package { 'nodejs':
+    ensure => present,
+  }
+
+  package { 'npm':
+    ensure  => present,
+    require => Package['nodejs'],
+  }
+
+  exec { 'install-bower':
+    cwd => '/',
+    command => 'npm install -g bower',
+    require => Package['npm','nodejs'],
+  }
+
   group { 'openstackid':
     ensure => present,
   }
@@ -245,7 +261,7 @@ class openstackid (
       File['/etc/openstackid/environment.php'],
       File['/etc/openstackid/server.php'],
       File['/etc/openstackid/app.php'],
-      Package['curl'],
+      Package['curl','nodejs','npm'],
       Package[$php5_packages] ],
   }
 
@@ -263,6 +279,7 @@ class openstackid (
       File['/etc/openstackid/log.php'],
       File['/etc/openstackid/environment.php'],
       File['/etc/openstackid/server.php'],
+      Package['nodejs','npm'],
       Package[$php5_packages] ],
   }
 
