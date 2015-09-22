@@ -74,6 +74,43 @@ class openstackid (
     ensure => present,
   }
 
+  # add node js and npm for bower installation
+  package { 'nodejs':
+    ensure => present,
+  }
+
+  package { 'npm':
+    ensure  => present,
+    require => Package['nodejs','curl'],
+  }
+
+  # install node version manager (https://www.npmjs.com/package/n)
+  exec { 'install-node-version-manager':
+    cwd       => '/',
+    path      => '/usr/bin:/bin:/usr/local/bin:/usr/lib/node_modules/npm/bin',
+    logoutput => on_failure,
+    command   => 'npm install -g n',
+    require   => Package['npm'],
+  }
+
+  # install latest node js version
+  exec { 'install-latest-nodejs':
+    cwd       => '/',
+    path      => '/usr/bin:/bin:/usr/local/bin:/usr/lib/node_modules/npm/bin',
+    logoutput => on_failure,
+    command   => 'n stable',
+    require   => Package['npm'],
+  }
+
+  # install bower
+  exec { 'install-bower':
+    cwd       => '/',
+    path      => '/usr/bin:/bin:/usr/local/bin:/usr/lib/node_modules/npm/bin',
+    logoutput => on_failure,
+    command   => 'npm install -g bower',
+    require   => Package['npm'],
+  }
+
   group { 'openstackid':
     ensure => present,
   }
@@ -246,7 +283,8 @@ class openstackid (
       File['/etc/openstackid/server.php'],
       File['/etc/openstackid/app.php'],
       Package['curl'],
-      Package[$php5_packages] ],
+      Package[$php5_packages] ,
+      Exec['install-bower'] ],
   }
 
   exec { 'update-site':
@@ -263,7 +301,8 @@ class openstackid (
       File['/etc/openstackid/log.php'],
       File['/etc/openstackid/environment.php'],
       File['/etc/openstackid/server.php'],
-      Package[$php5_packages] ],
+      Package[$php5_packages] ,
+      Exec['install-bower'] ],
   }
 
 }
