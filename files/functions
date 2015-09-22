@@ -68,6 +68,10 @@ function site_init {
     cd $target_dir
     php artisan migrate --env=$LARAVEL_ENV
     php artisan db:seed --env=$LARAVEL_ENV
+    # run bower
+    if [ -f "bower.json' ]; then
+        bower install --config.interactive=false
+    fi
     # activate site
     rm -rf $SITE_ROOT/w
     ln -s $SITE_ROOT/slot0 $SITE_ROOT/w
@@ -174,6 +178,10 @@ function site_update {
     # populate application database
     cd $target_dir
     php artisan migrate --env=$LARAVEL_ENV
+    # run bower
+    if [ -f "bower.json' ]; then
+        bower install --config.interactive=false
+    fi
     # activate site
     rm -rf $SITE_ROOT/w
     ln -s $target_dir $SITE_ROOT/w
