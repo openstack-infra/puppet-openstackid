@@ -51,6 +51,9 @@ class openstackid (
   $openstackid_release = 'latest',
   $ssl_enable = true,
   $oauth2_enable = true,
+  $app_url = '',
+  $app_key = '',
+  $app_timezone = 'UTC'
 ) {
 
   # php packages needed for openid server
@@ -94,6 +97,17 @@ class openstackid (
   file { '/etc/openstackid/database.php':
     ensure  => present,
     content => template('openstackid/database.php.erb'),
+    owner   => 'root',
+    group   => 'www-data',
+    mode    => '0640',
+    require => [
+      File['/etc/openstackid'],
+    ]
+  }
+
+  file { '/etc/openstackid/app.php':
+    ensure  => present,
+    content => template('openstackid/app.php.erb'),
     owner   => 'root',
     group   => 'www-data',
     mode    => '0640',
@@ -230,6 +244,7 @@ class openstackid (
       File['/etc/openstackid/log.php'],
       File['/etc/openstackid/environment.php'],
       File['/etc/openstackid/server.php'],
+      File['/etc/openstackid/app.php'],
       Package['curl'],
       Package[$php5_packages] ],
   }
@@ -244,6 +259,7 @@ class openstackid (
       Httpd::Vhost[$vhost_name],
       File['/etc/openstackid/recaptcha.php'],
       File['/etc/openstackid/database.php'],
+      File['/etc/openstackid/app.php'],
       File['/etc/openstackid/log.php'],
       File['/etc/openstackid/environment.php'],
       File['/etc/openstackid/server.php'],

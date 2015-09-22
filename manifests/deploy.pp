@@ -51,4 +51,3 @@ define openstackid::deploy (
     require => File[$deploy_dirs],
   }
 }
-
