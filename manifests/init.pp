@@ -84,13 +84,22 @@ class openstackid (
     require => Package['nodejs','curl'],
   }
 
+  # update node repo
+  exec { 'update-node-repo':
+    cwd       => '/',
+    path      => '/usr/bin:/bin:/usr/local/bin:/usr/lib/node_modules/npm/bin',
+    logoutput => on_failure,
+    command   => 'npm config set registry http://registry.npmjs.org/',
+    require   => Package['npm'],
+  }
+
   # install node version manager (https://www.npmjs.com/package/n)
   exec { 'install-node-version-manager':
     cwd       => '/',
     path      => '/usr/bin:/bin:/usr/local/bin:/usr/lib/node_modules/npm/bin',
     logoutput => on_failure,
     command   => 'npm install -g n',
-    require   => Package['npm'],
+    require   => Exec['update-node-repo'],
   }
 
   # install latest node js version
@@ -99,7 +108,7 @@ class openstackid (
     path      => '/usr/bin:/bin:/usr/local/bin:/usr/lib/node_modules/npm/bin',
     logoutput => on_failure,
     command   => 'n stable',
-    require   => Package['npm'],
+    require   => Exec['install-node-version-manager'],
   }
 
   # install bower
@@ -108,7 +117,7 @@ class openstackid (
     path      => '/usr/bin:/bin:/usr/local/bin:/usr/lib/node_modules/npm/bin',
     logoutput => on_failure,
     command   => 'npm install -g bower',
-    require   => Package['npm'],
+    require   => Exec['install-latest-nodejs'],
   }
 
   group { 'openstackid':
