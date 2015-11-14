@@ -70,7 +70,7 @@ function site_init {
     php artisan db:seed --env=$LARAVEL_ENV
     # run bower
     if [ -f "bower.json' ]; then
-        bower install --config.interactive=false
+        bower install --allow-root --config.interactive=false
     fi
     # activate site
     rm -rf $SITE_ROOT/w
@@ -180,7 +180,7 @@ function site_update {
     php artisan migrate --env=$LARAVEL_ENV
     # run bower
     if [ -f "bower.json' ]; then
-        bower install --config.interactive=false
+        bower install --allow-root --config.interactive=false
     fi
     # activate site
     rm -rf $SITE_ROOT/w
