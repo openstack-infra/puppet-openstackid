@@ -69,6 +69,15 @@ class openstackid (
     ensure => present,
   }
 
+  exec { 'php5enmod mcrypt':
+    ensure   => present,
+    creates  => '/etc/php5/apache2/conf.d/20-mcrypt.ini',
+    requires => [
+      Class[Http:Php],
+      Package[$php5_packages],
+    ],
+  }
+
   # the deploy scripts use the curl CLI
   package { 'curl':
     ensure => present,
