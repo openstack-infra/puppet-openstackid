@@ -277,6 +277,12 @@ class openstackid (
     require => Deploy['deploytool'],
   }
 
+  file { '/var/log/openstackid-deploy.log':
+    owner => 'root',
+    group => 'root',
+    mode  => '0644',
+  }
+
   exec { 'deploy-site':
     path      => '/usr/bin:/bin:/usr/local/bin',
     command   => '/opt/deploy/deploy.sh init openstackid',

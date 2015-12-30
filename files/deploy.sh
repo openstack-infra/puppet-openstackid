@@ -30,7 +30,7 @@ case $command in
         site_status ${2}
         ;;
     update)
-        site_update ${2}
+        site_update ${2} 2>&1 > ${LOGFILE}
         ;;
     *)
         print_help
