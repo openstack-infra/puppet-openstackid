@@ -68,10 +68,8 @@ function site_init {
     cd $target_dir
     php artisan migrate --env=$LARAVEL_ENV
     php artisan db:seed --env=$LARAVEL_ENV
-    # run bower
-    if [ -f "$target_dir/bower.json" ]; then
-        bower install --allow-root --config.interactive=false
-    fi
+    update_node
+    install_bower
     # activate site
     rm -rf $SITE_ROOT/w
     ln -s $SITE_ROOT/slot0 $SITE_ROOT/w
@@ -116,6 +114,21 @@ function catalog_get_version {
     RAW_LINE=`cat $SITE_ROOT/releases.lst | grep "$RELEASE_NAME" | sed "s/<[^>]\+>//g" | sed -r "s/^$RELEASE_NAME//"`
     RELEASE_DATE=`echo $RAW_LINE | awk '{ print $1 " " $2}'`
     echo $RELEASE_DATE
+}
+
+function update_node {
+    npm install -g n;
+    n latest;
+}
+
+function install_bower {
+    npm install -g bower;
+    npm install -g webpack;
+    cd $target_dir;
+    # run bower
+    if [ -f "$target_dir/bower.json" ]; then
+        bower install --allow-root --config.interactive=false
+    fi
 }
 
 function site_update {
@@ -178,10 +191,8 @@ function site_update {
     # populate application database
     cd $target_dir
     php artisan migrate --env=$LARAVEL_ENV
-    # run bower
-    if [ -f "$target_dir/bower.json" ]; then
-        bower install --allow-root --config.interactive=false
-    fi
+    update_node
+    install_bower
     # activate site
     rm -rf $SITE_ROOT/w
     ln -s $target_dir $SITE_ROOT/w
