@@ -74,16 +74,8 @@ class openstackid (
     ensure => present,
   }
 
+  # install nodejs default version
   class { '::nodejs':
-  }
-
-  # install bower
-  exec { 'install-bower':
-    cwd       => '/',
-    path      => '/usr/bin:/bin:/usr/local/bin:/usr/lib/node_modules/npm/bin',
-    logoutput => on_failure,
-    command   => 'npm install -g bower',
-    require   => Class['::nodejs'],
   }
 
   group { 'openstackid':
@@ -259,7 +251,8 @@ class openstackid (
       File['/etc/openstackid/app.php'],
       Package['curl'],
       Package[$php5_packages] ,
-      Exec['install-bower'] ],
+      Class['::nodejs'],
+    ],
   }
 
   exec { 'update-site':
@@ -277,7 +270,8 @@ class openstackid (
       File['/etc/openstackid/environment.php'],
       File['/etc/openstackid/server.php'],
       Package[$php5_packages] ,
-      Exec['install-bower'] ],
+      Class['::nodejs'],
+    ],
   }
 
 }
