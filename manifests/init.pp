@@ -236,7 +236,7 @@ class openstackid (
   }
 
   exec { 'deploy-site':
-    path      => '/usr/bin:/bin:/usr/local/bin',
+    path      => '/usr/local/bin:/usr/bin:/bin',
     command   => '/opt/deploy/deploy.sh init openstackid',
     onlyif    => '/opt/deploy/deploy.sh status openstackid | grep N/A',
     logoutput => on_failure,
@@ -256,7 +256,7 @@ class openstackid (
   }
 
   exec { 'update-site':
-    path      => '/usr/bin:/bin:/usr/local/bin',
+    path      => '/usr/local/bin:/usr/bin:/bin',
     command   => '/opt/deploy/deploy.sh update openstackid',
     onlyif    => '/opt/deploy/deploy.sh status openstackid | grep UPDATE',
     logoutput => on_failure,
