@@ -53,6 +53,7 @@ class openstackid (
   $oauth2_enable = true,
   $app_url = '',
   $app_key = '',
+  $app_version = '',
   $app_timezone = 'UTC'
 ) {
 

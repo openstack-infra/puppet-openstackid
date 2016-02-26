@@ -116,6 +116,7 @@ return array(
         'openid\OpenIdServiceProvider',
         'Greggilbert\Recaptcha\RecaptchaServiceProvider',
         'services\oauth2\CORS\CORSProvider',
+        'factories\FactoriesProvider',
     ),
 
     /*
@@ -182,5 +183,5 @@ return array(
         'View'            => 'Illuminate\Support\Facades\View',
         'RedisLV4'        => 'Illuminate\Support\Facades\Redis',
      ),
-
+     'version' => '<%= @app_version %>',
 );
