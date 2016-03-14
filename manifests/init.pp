@@ -54,7 +54,12 @@ class openstackid (
   $app_url = '',
   $app_key = '',
   $app_version = '',
-  $app_timezone = 'UTC'
+  $app_timezone = 'UTC',
+  $email_driver = 'mail',
+  $email_smtp_server = 'smtp.mailgun.org',
+  $email_smtp_server_port = 587,
+  $email_smtp_server_user = '',
+  $email_smtp_server_password = '',
 ) {
 
   # php packages needed for openid server
@@ -163,6 +168,17 @@ class openstackid (
         require => [
           File['/etc/openstackid'],
         ]
+  }
+
+  file { '/etc/openstackid/mail.php':
+    ensure  => present,
+    content => template('openstackid/mail.php.erb'),
+    owner   => 'root',
+    group   => 'www-data',
+    mode    => '0640',
+    require => [
+      File['/etc/openstackid'],
+    ]
   }
 
   $docroot_dirs = [ '/srv/openstackid' ]
