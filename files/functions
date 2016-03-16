@@ -57,6 +57,7 @@ function site_init {
     ln -sf /etc/openstackid/app.php $target_dir/app/config/$LARAVEL_ENV/app.php
     ln -sf /etc/openstackid/log.php $target_dir/app/config/$LARAVEL_ENV/log.php
     ln -sf /etc/openstackid/server.php $target_dir/app/config/$LARAVEL_ENV/server.php
+    ln -sf /etc/openstackid/mail.php $target_dir/app/config/$LARAVEL_ENV/mail.php
     # convert app/storage into symlink and set permissions
     mv $target_dir/app/storage $SITE_ROOT/
     chmod 02770 $SITE_ROOT/storage
@@ -185,6 +186,7 @@ function site_update {
     ln -sf /etc/openstackid/app.php $target_dir/app/config/$LARAVEL_ENV/app.php
     ln -sf /etc/openstackid/log.php $target_dir/app/config/$LARAVEL_ENV/log.php
     ln -sf /etc/openstackid/server.php $target_dir/app/config/$LARAVEL_ENV/server.php
+    ln -sf /etc/openstackid/mail.php $target_dir/app/config/$LARAVEL_ENV/mail.php
     # link shared app/storage directory
     rm -rf $target_dir/app/storage
     ln -s $SITE_ROOT/storage $target_dir/app
