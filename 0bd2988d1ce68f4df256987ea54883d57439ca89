@@ -1,0 +1,9 @@
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Code-Review+2: yolanda.robla <info@ysoft.biz>
+Workflow+1: yolanda.robla <info@ysoft.biz>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Wed, 16 Mar 2016 10:59:36 +0000
+Reviewed-on: https://review.openstack.org/292605
+Project: openstack-infra/puppet-openstackid
+Branch: refs/heads/master
