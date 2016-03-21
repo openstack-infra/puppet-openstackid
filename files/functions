@@ -68,7 +68,9 @@ function site_init {
     # populate application database
     cd $target_dir
     php artisan migrate --env=$LARAVEL_ENV
-    php artisan db:seed --env=$LARAVEL_ENV
+    if [[ $USE_DB_SEEDING -eq 1 ]]; then
+        php artisan db:seed --env=$LARAVEL_ENV
+    fi
     update_node
     install_bower
     # activate site
