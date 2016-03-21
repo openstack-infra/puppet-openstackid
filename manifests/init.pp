@@ -75,6 +75,16 @@ class openstackid (
     ensure => present,
   }
 
+  # Ensure Mcrypt is enabled
+  exec { 'enablemcrypt':
+    path    => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/' ],
+    command => 'php5enmod mcrypt',
+    notify  => Service['apache2'],
+    require => [
+      Httpd::Vhost[$vhost_name],
+      Package[$php5_packages] ] ,
+  }
+
   # the deploy scripts use the curl CLI
   package { 'curl':
     ensure => present,
