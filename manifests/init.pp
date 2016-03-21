@@ -217,6 +217,7 @@ class openstackid (
       group   => 'root',
       mode    => '0640',
       content => $ssl_cert_file_contents,
+      notify  => Service['apache2'],
       before  => Httpd::Vhost[$vhost_name],
     }
   }
@@ -227,6 +228,7 @@ class openstackid (
       group   => 'root',
       mode    => '0640',
       content => $ssl_key_file_contents,
+      notify  => Service['apache2'],
       before  => Httpd::Vhost[$vhost_name],
     }
   }
@@ -237,6 +239,7 @@ class openstackid (
       group   => 'root',
       mode    => '0640',
       content => $ssl_chain_file_contents,
+      notify  => Service['apache2'],
       before  => Httpd::Vhost[$vhost_name],
     }
   }
