@@ -60,6 +60,7 @@ class openstackid (
   $email_smtp_server_port = 587,
   $email_smtp_server_user = '',
   $email_smtp_server_password = '',
+  $use_db_seeding = false,
 ) {
 
   # php packages needed for openid server

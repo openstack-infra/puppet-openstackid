@@ -1,5 +1,6 @@
 SITE_ROOT=/srv/openstackid
 SOURCE_TARBALL=http://tarballs.openstack.org/openstackid/openstackid-<%= @openstackid_release %>.tar.gz
-LARAVEL_ENV=dev
+LARAVEL_ENV=<%= @id_environment %>
 RELEASE_NAME=openstackid-<%= @openstackid_release %>.tar.gz
 SOURCE_ROOT=http://tarballs.openstack.org/openstackid/
+USE_DB_SEEDING=<%= @use_db_seeding?1:0 %>
