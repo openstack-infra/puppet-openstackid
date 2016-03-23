@@ -1,0 +1,17 @@
+# prefork MPM
+# StartServers: initial number of server processes to start
+# MinSpareServers: minimum number of worker threads which are kept spare
+# MaxSpareServers: maximum number of worker threads which are kept spare
+# MaxClients: maximum number of simultaneous client connections (MaxClients should always be <= ServerLimit)
+# ServerLimit:is only used if you need to set MaxClients higher than 256 (default). Do not set the value of this
+# directive any higher than what you might want to set MaxClients to.
+# MaxRequestsPerChild: maximum number of requests a server process serves
+# if you are unable to determine this information the standard 1000 should be used.
+<IfModule mpm_prefork_module>
+   StartServers 3
+   MinSpareServers 96
+   MaxSpareServers 192
+   MaxClients 1024
+   ServerLimit 1024
+   MaxRequestsPerChild 1000
+</IfModule>
