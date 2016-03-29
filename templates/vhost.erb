@@ -36,11 +36,15 @@
   RewriteCond %{HTTP_HOST} !<%= scope.lookupvar("openstackid::vhost_name") %>
   RewriteRule ^.*$ <%= scope.lookupvar("openstackid::canonicalweburl") %>
 
-  DocumentRoot <%= docroot %>
-  <Directory <%= docroot %>/>
+  DocumentRoot <%= @docroot %>
+  <Directory <%= @docroot %>/>
     Order allow,deny
     Allow from all
   </Directory>
+
+  <FilesMatch \.php$>
+    SetHandler "proxy:fcgi://127.0.0.1:9000"
+  </FilesMatch>
 
 </VirtualHost>
 </IfModule>
