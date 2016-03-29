@@ -66,14 +66,47 @@ class openstackid (
   # php packages needed for openid server
   $php5_packages = [
       'php5-common',
-      'php5-curl',
       'php5-cli',
       'php5-mcrypt',
-      'php5-mysql',
+      'php5-curl',
+      'php5-gd',
+      'php5-json',
+      'php5-gmp',
+      'php5-mysqlnd',
+      'php5-fpm',
     ]
 
   package { $php5_packages:
     ensure => present,
+  }
+
+  # php5-fpm configuration
+
+  exec { 'enable_php5-mbcrypt':
+    command => '/usr/sbin/php5enmod mcrypt',
+    timeout => 0,
+    require => [
+      Package['php5-fpm'],
+    ],
+    notify => Service['php5-fpm'],
+  }
+
+  file { '/etc/php5/fpm/pool.d/www.conf':
+    ensure  => present,
+    content => template('openstackid/www.conf.erb'),
+    owner   => 'root',
+    group   => 'www-data',
+    mode    => '0640',
+    require => [
+      Package['php5-fpm'],
+    ],
+    notify => Service['php5-fpm'],
+  }
+
+  service { 'php5-fpm':
+    ensure  => "running",
+    enable  => true,
+    require => Package['php5-fpm'],
   }
 
   # the deploy scripts use the curl CLI
@@ -193,8 +226,7 @@ class openstackid (
 
   include ::httpd
   include ::httpd::ssl
-  include ::httpd::php
-  ::httpd::vhost { $vhost_name:
+ ::httpd::vhost { $vhost_name:
     port     => 443,
     docroot  => '/srv/openstackid/w/public',
     priority => '50',
@@ -208,7 +240,7 @@ class openstackid (
   httpd_mod { 'proxy':
     ensure => present,
   }
-  httpd_mod { 'proxy_http':
+  httpd_mod { 'proxy_fcgi':
     ensure => present,
   }
 
