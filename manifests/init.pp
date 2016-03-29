@@ -69,11 +69,43 @@ class openstackid (
       'php5-curl',
       'php5-cli',
       'php5-mcrypt',
-      'php5-mysql',
+      'php5-mysqlnd',
+      'php5-fpm',
+      'php5-json',
+      'php5-gmp',
     ]
 
   package { $php5_packages:
     ensure => present,
+  }
+
+  # php5-fpm configuration
+
+  exec { 'enable_php5-mbcrypt':
+    command => '/usr/sbin/php5enmod mcrypt',
+    timeout => 0,
+    require => [
+      Package['php5-fpm'],
+    ],
+    notify  => Service['php5-fpm'],
+  }
+
+  file { '/etc/php5/fpm/pool.d/www.conf':
+    ensure  => present,
+    owner   => 'root',
+    group   => 'www-data',
+    mode    => '0640',
+    source  => 'puppet:///modules/openstackid/www.conf',
+    require => [
+      Package['php5-fpm'],
+    ],
+    notify  => Service['php5-fpm'],
+  }
+
+  service { 'php5-fpm':
+    ensure  => 'running',
+    enable  => true,
+    require => Package['php5-fpm'],
   }
 
   # the deploy scripts use the curl CLI
@@ -191,26 +223,24 @@ class openstackid (
     mode   => '0755',
   }
 
-  include ::httpd
-  include ::httpd::ssl
-  include ::httpd::php
-  ::httpd::vhost { $vhost_name:
-    port     => 443,
-    docroot  => '/srv/openstackid/w/public',
+  class { '::apache':
+    default_vhost => false,
+    mpm_module    => 'event',
+  }
+
+  ::apache::listen { '80': }
+  ::apache::listen { '443': }
+
+  apache::vhost::custom { $vhost_name:
     priority => '50',
-    template => 'openstackid/vhost.erb',
-    ssl      => true,
+    content  => template('openstackid/vhost.erb'),
     require  => File[$docroot_dirs],
   }
-  httpd_mod { 'rewrite':
-    ensure => present,
-  }
-  httpd_mod { 'proxy':
-    ensure => present,
-  }
-  httpd_mod { 'proxy_http':
-    ensure => present,
-  }
+
+  class { '::apache::mod::ssl': }
+  class { '::apache::mod::rewrite': }
+  class { '::apache::mod::proxy': }
+  ::apache::mod { 'proxy_fcgi': }
 
   if $ssl_cert_file_contents != '' {
     file { $ssl_cert_file:
@@ -218,8 +248,8 @@ class openstackid (
       group   => 'root',
       mode    => '0640',
       content => $ssl_cert_file_contents,
-      notify  => Service['httpd'],
-      before  => Httpd::Vhost[$vhost_name],
+      notify  => Class['::apache::service'],
+      before  => Apache::vhost::custom[$vhost_name],
     }
   }
 
@@ -229,8 +259,8 @@ class openstackid (
       group   => 'root',
       mode    => '0640',
       content => $ssl_key_file_contents,
-      notify  => Service['httpd'],
-      before  => Httpd::Vhost[$vhost_name],
+      notify  => Class['::apache::service'],
+      before  => Apache::vhost::custom[$vhost_name],
     }
   }
 
@@ -240,8 +270,8 @@ class openstackid (
       group   => 'root',
       mode    => '0640',
       content => $ssl_chain_file_contents,
-      notify  => Service['httpd'],
-      before  => Httpd::Vhost[$vhost_name],
+      notify  => Class['::apache::service'],
+      before  => Apache::vhost::custom[$vhost_name],
     }
   }
 
@@ -266,7 +296,7 @@ class openstackid (
       group   => 'root',
       mode    => '0644',
       source  => 'puppet:///modules/openstackid/apache-connection-tuning',
-      notify  => Service['httpd'],
+      notify  => Class['::apache::service'],
       require => File['/etc/apache2/conf.d'],
     }
   } else {
@@ -295,7 +325,7 @@ class openstackid (
     file { '/etc/apache2/conf-enabled/connection-tuning':
       ensure  => link,
       target  => '/etc/apache2/conf-available/connection-tuning.conf',
-      notify  => Service['httpd'],
+      notify  => Class['::apache::service'],
       require => [
         File['/etc/apache2/conf-enabled'],
         File['/etc/apache2/conf-available/connection-tuning'],
@@ -321,7 +351,7 @@ class openstackid (
     logoutput => on_failure,
     require   => [
       File['/opt/deploy/conf.d/openstackid.conf'],
-      Httpd::Vhost[$vhost_name],
+      Apache::vhost::custom[$vhost_name],
       File['/etc/openstackid/recaptcha.php'],
       File['/etc/openstackid/database.php'],
       File['/etc/openstackid/log.php'],
@@ -341,7 +371,7 @@ class openstackid (
     logoutput => on_failure,
     require   => [
       File['/opt/deploy/conf.d/openstackid.conf'],
-      Httpd::Vhost[$vhost_name],
+      Apache::vhost::custom[$vhost_name],
       File['/etc/openstackid/recaptcha.php'],
       File['/etc/openstackid/database.php'],
       File['/etc/openstackid/app.php'],
