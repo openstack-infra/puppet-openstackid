@@ -82,15 +82,6 @@ class openstackid (
 
   # php5-fpm configuration
 
-  exec { 'enable_php5-mbcrypt':
-    command => '/usr/sbin/php5enmod mcrypt',
-    timeout => 0,
-    require => [
-      Package['php5-fpm'],
-    ],
-    notify  => Service['php5-fpm'],
-  }
-
   file { '/etc/php5/fpm/pool.d/www.conf':
     ensure  => present,
     owner   => 'root',
@@ -226,7 +217,18 @@ class openstackid (
 
   class { '::apache':
     default_vhost => false,
-    mpm_module    => 'event',
+    mpm_module    => false,
+  }
+
+  class {'::apache::mod::event':
+    maxclients             => 4096,
+    maxconnectionsperchild => 5000,
+    serverlimit            => 128,
+    startservers           => 3,
+    threadlimit            => 64,
+    threadsperchild        => 32,
+    maxsparethreads        => 192,
+    minsparethreads        => 96,
   }
 
   ::apache::listen { '80': }
@@ -288,51 +290,6 @@ class openstackid (
     owner  => 'root',
     group  => 'root',
     mode   => '0755',
-  }
-
-  if ($::lsbdistcodename == 'precise') {
-
-    file { '/etc/apache2/conf.d/connection-tuning':
-      ensure  => present,
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0644',
-      source  => 'puppet:///modules/openstackid/apache-connection-tuning',
-      notify  => Class['::apache::service'],
-      require => File['/etc/apache2/conf.d'],
-    }
-  } else {
-    file { '/etc/apache2/conf-available':
-      ensure  => directory,
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0755',
-      require => File['/etc/apache2'],
-    }
-    file { '/etc/apache2/conf-available/connection-tuning':
-      ensure  => present,
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0644',
-      source  => 'puppet:///modules/openstackid/apache-connection-tuning',
-      require => File['/etc/apache2/conf-available'],
-    }
-    file { '/etc/apache2/conf-enabled':
-      ensure  => directory,
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0755',
-      require => File['/etc/apache2'],
-    }
-    file { '/etc/apache2/conf-enabled/connection-tuning':
-      ensure  => link,
-      target  => '/etc/apache2/conf-available/connection-tuning.conf',
-      notify  => Class['::apache::service'],
-      require => [
-        File['/etc/apache2/conf-enabled'],
-        File['/etc/apache2/conf-available/connection-tuning'],
-      ],
-    }
   }
 
   deploy { 'deploytool':
