@@ -241,7 +241,14 @@ class openstackid (
   class { '::apache::mod::ssl': }
   class { '::apache::mod::rewrite': }
   class { '::apache::mod::proxy': }
-  ::apache::mod { 'proxy_fcgi': }
+
+  if ($::lsbdistcodename == 'precise') {
+    class { '::apache::mod::fastcgi': }
+    class { '::apache::mod::actions': }
+  }
+  else {
+    ::apache::mod { 'proxy_fcgi': }
+  }
 
   if $ssl_cert_file_contents != '' {
     file { $ssl_cert_file:
