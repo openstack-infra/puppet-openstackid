@@ -82,6 +82,15 @@ class openstackid (
 
   # php5-fpm configuration
 
+  exec { 'enable_php5-mbcrypt':
+    command => '/usr/sbin/php5enmod mcrypt',
+    timeout => 0,
+    require => [
+      Package['php5-fpm'],
+    ],
+    notify  => Service['php5-fpm'],
+  }
+
   file { '/etc/php5/fpm/pool.d/www.conf':
     ensure  => present,
     owner   => 'root',
