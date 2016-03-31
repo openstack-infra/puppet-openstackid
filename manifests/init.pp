@@ -229,15 +229,18 @@ class openstackid (
     mpm_module    => false,
   }
 
+  # apache mpm event connectio tweaking
   class {'::apache::mod::event':
-    maxclients             => 4096,
-    maxconnectionsperchild => 5000,
-    serverlimit            => 128,
-    startservers           => 3,
-    threadlimit            => 64,
-    threadsperchild        => 32,
-    maxsparethreads        => 192,
-    minsparethreads        => 96,
+    serverlimit         => 128,
+    startservers        => 3,
+    minsparethreads     => 96,
+    maxsparethreads     => 192,
+    threadlimit         => 64,
+    threadsperchild     => 32,
+    threadlimit         => 64,
+    maxclients          => 4096,
+    maxrequestsperchild => 5000,
+    maxrequestworkers   => 4096,
   }
 
   ::apache::listen { '80': }
@@ -350,5 +353,35 @@ class openstackid (
       Class['::nodejs'],
     ],
   }
+
+  # system configuration tweaking
+  $my_sysctl_settings = {
+    # redis : http://redis.io/topics/admin
+    'vm.overcommit_memory'        => { value => 1 },
+    'net.core.rmem_default'       => { value => 31457280 },
+    'net.core.rmem_max'           => { value => 12582912 },
+    'net.core.wmem_default'       => { value => 31457280 },
+    'net.core.wmem_max'           => { value => 12582912 },
+    # Increase number of incoming connections
+    'net.core.somaxconn'          => { value => 4096 },
+    # Increase number of incoming connections backlog
+    'net.core.netdev_max_backlog' => { value => 65536 },
+    'net.core.optmem_max'         => { value => 25165824 },
+    'net.ipv4.tcp_mem'            => { value => "65536\t131072\t262144" },
+    'net.ipv4.udp_mem'            => { value => "65536\t131072\t262144" },
+    'net.ipv4.tcp_rmem'           => { value => "8192\t87380\t16777216" },
+    'net.ipv4.udp_rmem_min'       => { value => 16384 },
+    'net.ipv4.tcp_wmem'           => { value => "8192\t65536\t16777216" },
+    'net.ipv4.udp_wmem_min'       => { value => 16384 },
+    'net.ipv4.tcp_max_tw_buckets' => { value => 1440000 },
+    # Increase the tcp-time-wait buckets pool size to prevent simple DOS attacks
+    'net.ipv4.tcp_tw_recycle'     => { value => 1 },
+    'net.ipv4.tcp_tw_reuse'       => { value => 1 },
+  }
+
+  $my_sysctl_defaults = {
+  }
+
+  create_resources(sysctl::value,$my_sysctl_settings,$my_sysctl_defaults)
 
 }
