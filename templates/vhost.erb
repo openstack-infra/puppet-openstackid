@@ -35,6 +35,9 @@
   RewriteEngine on
   RewriteCond %{HTTP_HOST} !<%= scope.lookupvar("openstackid::vhost_name") %>
   RewriteRule ^.*$ <%= scope.lookupvar("openstackid::canonicalweburl") %>
+  # send basic auth header
+  RewriteCond %{HTTP:Authorization} ^(.*)
+  RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
 
   DocumentRoot <%= @docroot %>
   <Directory <%= @docroot %>/>
