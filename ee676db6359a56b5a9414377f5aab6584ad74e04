@@ -1,0 +1,11 @@
+Code-Review+1: sebastian marcet <smarcet@gmail.com>
+Code-Review+2: yolanda.robla <yroblamo@redhat.com>
+Code-Review+1: Jp Maxwell <jpmaxman@tipit.net>
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Workflow+1: Jeremy Stanley <fungi@yuggoth.org>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Fri, 21 Oct 2016 15:09:21 +0000
+Reviewed-on: https://review.openstack.org/389244
+Project: openstack-infra/puppet-openstackid
+Branch: refs/heads/master
