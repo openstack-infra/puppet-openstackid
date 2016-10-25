@@ -46,7 +46,7 @@
   </Directory>
 
   <IfModule mod_proxy_fcgi.c>
-      ProxyPassMatch ^/(.*\.php(/.*)?)$ fcgi://127.0.0.1:9000<%= @docroot %>/$1
+      ProxyPassMatch ^/(.*\.php(/.*)?)$ fcgi://127.0.0.1:9000<%= @docroot %>/$1 retry=0
   </IfModule>
 
   <IfModule mod_fastcgi.c>
