@@ -29,6 +29,7 @@ class openstackid (
   $ss_db_name = '',
   $redis_port = '',
   $redis_host = '',
+  $redis_db   = 0,
   $redis_password = '',
   $vhost_name = $::fqdn,
   $robots_txt_source = '',
@@ -62,19 +63,33 @@ class openstackid (
   $email_smtp_server_password = '',
   $use_db_seeding = false,
   $docroot = '/srv/openstackid/w/public',
+  $laravel_version = 4,
+  $app_log_level = 'error',
+  $app_log_email_level = 'error',
+  $db_log_enabled = false,
+  $banning_enabled = true,
+  $app_debug = false,
+  $app_locale = 'en',
+  $curl_verify_ssl_cert = true,
+  $curl_allow_redirect = false,
+  $curl_timeout = 60,
+  $assets_base_url = 'https://www.openstack.org/',
+  $cache_driver = 'redis',
+  $session_driver = 'redis',
+  $session_cookie_secure = false,
 ) {
 
   # php packages needed for openid server
   $php5_packages = [
-      'php5-common',
-      'php5-curl',
-      'php5-cli',
-      'php5-mcrypt',
-      'php5-mysqlnd',
-      'php5-fpm',
-      'php5-json',
-      'php5-gmp',
-    ]
+    'php5-common',
+    'php5-curl',
+    'php5-cli',
+    'php5-mcrypt',
+    'php5-mysqlnd',
+    'php5-fpm',
+    'php5-json',
+    'php5-gmp',
+  ]
 
   package { $php5_packages:
     ensure => present,
@@ -138,81 +153,99 @@ class openstackid (
     mode   => '0755',
   }
 
-  file { '/etc/openstackid/database.php':
-    ensure  => present,
-    content => template('openstackid/database.php.erb'),
-    owner   => 'root',
-    group   => 'www-data',
-    mode    => '0640',
-    require => [
-      File['/etc/openstackid'],
-    ]
-  }
+  if($laravel_version == 4 ){
 
-  file { '/etc/openstackid/app.php':
-    ensure  => present,
-    content => template('openstackid/app.php.erb'),
-    owner   => 'root',
-    group   => 'www-data',
-    mode    => '0640',
-    require => [
-      File['/etc/openstackid'],
-    ]
-  }
-
-  file { '/etc/openstackid/log.php':
-      ensure  => present,
-      content => template('openstackid/log.php.erb'),
-      owner   => 'root',
-      group   => 'www-data',
-      mode    => '0640',
-      require => [
-        File['/etc/openstackid'],
-      ]
-  }
-
-  file { '/etc/openstackid/environment.php':
-      ensure  => present,
-      content => template('openstackid/environment.php.erb'),
-      owner   => 'root',
-      group   => 'www-data',
-      mode    => '0640',
-      require => [
-        File['/etc/openstackid'],
-      ]
-  }
-
-  file { '/etc/openstackid/recaptcha.php':
+      # laravel 4.X configuration files
+      file { '/etc/openstackid/database.php':
         ensure  => present,
-        content => template('openstackid/recaptcha.php.erb'),
+        content => template('openstackid/lv4/database.php.erb'),
         owner   => 'root',
         group   => 'www-data',
         mode    => '0640',
         require => [
           File['/etc/openstackid'],
         ]
-  }
+      }
 
-  file { '/etc/openstackid/server.php':
+      file { '/etc/openstackid/app.php':
         ensure  => present,
-        content => template('openstackid/server.php.erb'),
+        content => template('openstackid/lv4/app.php.erb'),
         owner   => 'root',
         group   => 'www-data',
         mode    => '0640',
         require => [
           File['/etc/openstackid'],
         ]
-  }
+      }
 
-  file { '/etc/openstackid/mail.php':
-    ensure  => present,
-    content => template('openstackid/mail.php.erb'),
-    owner   => 'root',
-    group   => 'www-data',
-    mode    => '0640',
-    require => [
-      File['/etc/openstackid'],
-    ]
+      file { '/etc/openstackid/log.php':
+        ensure  => present,
+        content => template('openstackid/lv4/log.php.erb'),
+        owner   => 'root',
+        group   => 'www-data',
+        mode    => '0640',
+        require => [
+          File['/etc/openstackid'],
+        ]
+      }
+
+      file { '/etc/openstackid/environment.php':
+        ensure  => present,
+        content => template('openstackid/lv4/environment.php.erb'),
+        owner   => 'root',
+        group   => 'www-data',
+        mode    => '0640',
+        require => [
+          File['/etc/openstackid'],
+        ]
+      }
+
+      file { '/etc/openstackid/recaptcha.php':
+        ensure  => present,
+        content => template('openstackid/lv4/recaptcha.php.erb'),
+        owner   => 'root',
+        group   => 'www-data',
+        mode    => '0640',
+        require => [
+          File['/etc/openstackid'],
+        ]
+      }
+
+      file { '/etc/openstackid/server.php':
+        ensure  => present,
+        content => template('openstackid/lv4/server.php.erb'),
+        owner   => 'root',
+        group   => 'www-data',
+        mode    => '0640',
+        require => [
+          File['/etc/openstackid'],
+        ]
+      }
+
+      file { '/etc/openstackid/mail.php':
+        ensure  => present,
+        content => template('openstackid/lv4/mail.php.erb'),
+        owner   => 'root',
+        group   => 'www-data',
+        mode    => '0640',
+        require => [
+          File['/etc/openstackid'],
+        ]
+      }
+
+  }
+  else
+  {
+      file { '/etc/openstackid/.env':
+        ensure  => present,
+        content => template('openstackid/lv5/.env.erb'),
+        owner   => 'root',
+        group   => 'www-data',
+        mode    => '0640',
+        require => [
+          File['/etc/openstackid'],
+        ]
+    }
   }
 
   $docroot_dirs = [ '/srv/openstackid' ]
@@ -229,7 +262,7 @@ class openstackid (
     mpm_module    => false,
   }
 
-  # apache mpm event connectio tweaking
+  # apache mpm event connection tweaking
   class {'::apache::mod::event':
     serverlimit         => 128,
     startservers        => 3,
@@ -314,24 +347,60 @@ class openstackid (
     require => Deploy['deploytool'],
   }
 
+  if($laravel_version == 4 ){
+
+    $deploy_site_requires =  [
+        File['/opt/deploy/conf.d/openstackid.conf'],
+        Apache::Vhost::Custom[$vhost_name],
+        File['/etc/openstackid/recaptcha.php'],
+        File['/etc/openstackid/database.php'],
+        File['/etc/openstackid/log.php'],
+        File['/etc/openstackid/environment.php'],
+        File['/etc/openstackid/server.php'],
+        File['/etc/openstackid/app.php'],
+        Package['curl'],
+        Package[$php5_packages] ,
+        Class['::nodejs'],
+    ]
+
+    $update_site_requires = [
+        File['/opt/deploy/conf.d/openstackid.conf'],
+        Apache::Vhost::Custom[$vhost_name],
+        File['/etc/openstackid/recaptcha.php'],
+        File['/etc/openstackid/database.php'],
+        File['/etc/openstackid/app.php'],
+        File['/etc/openstackid/log.php'],
+        File['/etc/openstackid/environment.php'],
+        File['/etc/openstackid/server.php'],
+        Package[$php5_packages] ,
+        Class['::nodejs'],
+    ]
+  }
+  else{
+    $deploy_site_requires =  [
+        File['/opt/deploy/conf.d/openstackid.conf'],
+        Apache::Vhost::Custom[$vhost_name],
+        File['/etc/openstackid/.env'],
+        Package['curl'],
+        Package[$php5_packages] ,
+        Class['::nodejs'],
+    ]
+
+    $update_site_requires = [
+        File['/opt/deploy/conf.d/openstackid.conf'],
+        Apache::Vhost::Custom[$vhost_name],
+        File['/etc/openstackid/.env'],
+        Package[$php5_packages] ,
+        Class['::nodejs'],
+    ]
+  }
+
   exec { 'deploy-site':
     path      => '/usr/local/bin:/usr/bin:/bin',
     command   => '/opt/deploy/deploy.sh init openstackid',
     onlyif    => '/opt/deploy/deploy.sh status openstackid | grep N/A',
     logoutput => on_failure,
-    require   => [
-      File['/opt/deploy/conf.d/openstackid.conf'],
-      Apache::Vhost::Custom[$vhost_name],
-      File['/etc/openstackid/recaptcha.php'],
-      File['/etc/openstackid/database.php'],
-      File['/etc/openstackid/log.php'],
-      File['/etc/openstackid/environment.php'],
-      File['/etc/openstackid/server.php'],
-      File['/etc/openstackid/app.php'],
-      Package['curl'],
-      Package[$php5_packages] ,
-      Class['::nodejs'],
-    ],
+    require   => $deploy_site_requires,
   }
 
   exec { 'update-site':
@@ -339,18 +408,7 @@ class openstackid (
     command   => '/opt/deploy/deploy.sh update openstackid',
     onlyif    => '/opt/deploy/deploy.sh status openstackid | grep UPDATE',
     logoutput => on_failure,
-    require   => [
-      File['/opt/deploy/conf.d/openstackid.conf'],
-      Apache::Vhost::Custom[$vhost_name],
-      File['/etc/openstackid/recaptcha.php'],
-      File['/etc/openstackid/database.php'],
-      File['/etc/openstackid/app.php'],
-      File['/etc/openstackid/log.php'],
-      File['/etc/openstackid/environment.php'],
-      File['/etc/openstackid/server.php'],
-      Package[$php5_packages] ,
-      Class['::nodejs'],
-    ],
+    require   => $update_site_requires,
   }
 
   # system configuration tweaking
