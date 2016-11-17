@@ -51,26 +51,42 @@ function site_init {
     chown -R $FILE_OWNER:$FILE_GROUP $target_dir
     umask 0022
     # link configuration files managed by puppet
-    ln -sf /etc/openstackid/environment.php $target_dir/bootstrap/environment.php
-    ln -sf /etc/openstackid/recaptcha.php $target_dir/app/config/packages/greggilbert/recaptcha/$LARAVEL_ENV/config.php
-    ln -sf /etc/openstackid/database.php $target_dir/app/config/$LARAVEL_ENV/database.php
-    ln -sf /etc/openstackid/app.php $target_dir/app/config/$LARAVEL_ENV/app.php
-    ln -sf /etc/openstackid/log.php $target_dir/app/config/$LARAVEL_ENV/log.php
-    ln -sf /etc/openstackid/server.php $target_dir/app/config/$LARAVEL_ENV/server.php
-    ln -sf /etc/openstackid/mail.php $target_dir/app/config/$LARAVEL_ENV/mail.php
-    # convert app/storage into symlink and set permissions
-    mv $target_dir/app/storage $SITE_ROOT/
-    chmod 02770 $SITE_ROOT/storage
-    find $SITE_ROOT/storage/ -type d -exec chmod 0775 {} \;
-    find $SITE_ROOT/storage/ -type f -exec chmod 0664 {} \;
-    rm -rf $target_dir/app/storage
-    ln -s $SITE_ROOT/storage $target_dir/app
+
+    if [[ $LARAVEL_VERSION -eq 4 ]]; then
+        ln -sf /etc/openstackid/environment.php $target_dir/bootstrap/environment.php
+        ln -sf /etc/openstackid/recaptcha.php $target_dir/app/config/packages/greggilbert/recaptcha/$LARAVEL_ENV/config.php
+        ln -sf /etc/openstackid/database.php $target_dir/app/config/$LARAVEL_ENV/database.php
+        ln -sf /etc/openstackid/app.php $target_dir/app/config/$LARAVEL_ENV/app.php
+        ln -sf /etc/openstackid/log.php $target_dir/app/config/$LARAVEL_ENV/log.php
+        ln -sf /etc/openstackid/server.php $target_dir/app/config/$LARAVEL_ENV/server.php
+        ln -sf /etc/openstackid/mail.php $target_dir/app/config/$LARAVEL_ENV/mail.php
+        # convert app/storage into symlink and set permissions
+        mv $target_dir/app/storage $SITE_ROOT/
+        chmod 02770 $SITE_ROOT/storage
+        find $SITE_ROOT/storage/ -type d -exec chmod 0775 {} \;
+        find $SITE_ROOT/storage/ -type f -exec chmod 0664 {} \;
+        rm -rf $target_dir/app/storage
+        ln -s $SITE_ROOT/storage $target_dir/app
+    fi
+
+    if [[ $LARAVEL_VERSION -eq 5 ]]; then
+       ln -sf /etc/openstackid/.env $target_dir/.env
+       # convert app/storage into symlink and set permissions
+       mv $target_dir/storage $SITE_ROOT/
+       chmod 02770 $SITE_ROOT/storage
+       find $SITE_ROOT/storage/ -type d -exec chmod 0775 {} \;
+       find $SITE_ROOT/storage/ -type f -exec chmod 0664 {} \;
+       rm -rf $target_dir/storage
+       ln -s $SITE_ROOT/storage $target_dir
+    fi
+
     # populate application database
     cd $target_dir
     php artisan migrate --env=$LARAVEL_ENV
     if [[ $USE_DB_SEEDING -eq 1 ]]; then
         php artisan db:seed --env=$LARAVEL_ENV
     fi
+
     update_node
     install_bower
     # activate site
@@ -181,17 +197,28 @@ function site_update {
     fi
     chown -R $FILE_OWNER:$FILE_GROUP $target_dir
     umask 0022
+
     # link configuration files managed by puppet
-    ln -sf /etc/openstackid/environment.php $target_dir/bootstrap/environment.php
-    ln -sf /etc/openstackid/recaptcha.php $target_dir/app/config/packages/greggilbert/recaptcha/$LARAVEL_ENV/config.php
-    ln -sf /etc/openstackid/database.php $target_dir/app/config/$LARAVEL_ENV/database.php
-    ln -sf /etc/openstackid/app.php $target_dir/app/config/$LARAVEL_ENV/app.php
-    ln -sf /etc/openstackid/log.php $target_dir/app/config/$LARAVEL_ENV/log.php
-    ln -sf /etc/openstackid/server.php $target_dir/app/config/$LARAVEL_ENV/server.php
-    ln -sf /etc/openstackid/mail.php $target_dir/app/config/$LARAVEL_ENV/mail.php
-    # link shared app/storage directory
-    rm -rf $target_dir/app/storage
-    ln -s $SITE_ROOT/storage $target_dir/app
+    if [[ $LARAVEL_VERSION -eq 4 ]]; then
+        ln -sf /etc/openstackid/environment.php $target_dir/bootstrap/environment.php
+        ln -sf /etc/openstackid/recaptcha.php $target_dir/app/config/packages/greggilbert/recaptcha/$LARAVEL_ENV/config.php
+        ln -sf /etc/openstackid/database.php $target_dir/app/config/$LARAVEL_ENV/database.php
+        ln -sf /etc/openstackid/app.php $target_dir/app/config/$LARAVEL_ENV/app.php
+        ln -sf /etc/openstackid/log.php $target_dir/app/config/$LARAVEL_ENV/log.php
+        ln -sf /etc/openstackid/server.php $target_dir/app/config/$LARAVEL_ENV/server.php
+        ln -sf /etc/openstackid/mail.php $target_dir/app/config/$LARAVEL_ENV/mail.php
+        # link shared app/storage directory
+        rm -rf $target_dir/app/storage
+        ln -s $SITE_ROOT/storage $target_dir/app
+    fi
+
+    if [[ $LARAVEL_VERSION -eq 5 ]]; then
+        ln -sf /etc/openstackid/.env $target_dir/.env
+        # link shared app/storage directory
+        rm -rf $target_dir/storage
+        ln -s $SITE_ROOT/storage $target_dir
+    fi
+
     # populate application database
     cd $target_dir
     php artisan migrate --env=$LARAVEL_ENV
