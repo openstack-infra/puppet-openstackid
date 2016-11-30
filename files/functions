@@ -217,6 +217,21 @@ function site_update {
         # link shared app/storage directory
         rm -rf $target_dir/storage
         ln -s $SITE_ROOT/storage $target_dir
+        # check for new storage structure ( LV 5.x)
+        if [[ ! -d $SITE_ROOT/storage/framework ]]; then
+           mkdir -p $SITE_ROOT/storage/framework;
+           mkdir -p $SITE_ROOT/storage/framework/cache;
+           mkdir -p $SITE_ROOT/storage/framework/views;
+           mkdir -p $SITE_ROOT/storage/framework/sessions;
+        fi
+        if [[ ! -d $SITE_ROOT/storage/app ]]; then
+           mkdir -p $SITE_ROOT/storage/app;
+           mkdir -p $SITE_ROOT/storage/app/public;
+        fi
+        # set permissions
+        chmod 02770 $SITE_ROOT/storage;
+        find $SITE_ROOT/storage/ -type d -exec chmod 0775 {} \;
+        find $SITE_ROOT/storage/ -type f -exec chmod 0664 {} \;
     fi
 
     # populate application database
