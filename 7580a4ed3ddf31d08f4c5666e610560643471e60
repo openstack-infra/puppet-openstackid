@@ -1,0 +1,9 @@
+Code-Review+1: Janet McArthur <jimmy+jimmy2@tipit.net>
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Workflow+1: Jeremy Stanley <fungi@yuggoth.org>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Fri, 06 Jan 2017 14:53:41 +0000
+Reviewed-on: https://review.openstack.org/404995
+Project: openstack-infra/puppet-openstackid
+Branch: refs/heads/master
