@@ -106,6 +106,30 @@ class openstackid (
     notify  => Service['php5-fpm'],
   }
 
+  file { '/etc/php5/fpm/php-fpm.conf':
+    ensure  => present,
+    owner   => 'root',
+    group   => 'www-data',
+    mode    => '0640',
+    source  => 'puppet:///modules/openstackid/php-fpm.conf',
+    require => [
+      Package['php5-fpm'],
+    ],
+    notify  => Service['php5-fpm'],
+  }
+
+  file { '/etc/php5/fpm/php.ini':
+    ensure  => present,
+    owner   => 'root',
+    group   => 'www-data',
+    mode    => '0640',
+    source  => 'puppet:///modules/openstackid/php.ini',
+    require => [
+      Package['php5-fpm'],
+    ],
+    notify  => Service['php5-fpm'],
+  }
+
   file { '/etc/php5/fpm/pool.d/www.conf':
     ensure  => present,
     owner   => 'root',
@@ -264,12 +288,10 @@ class openstackid (
 
   # apache mpm event connection tweaking
   class {'::apache::mod::event':
-    serverlimit         => 128,
+    serverlimit         => 16,
     startservers        => 3,
-    minsparethreads     => 96,
-    maxsparethreads     => 192,
-    threadlimit         => 64,
-    threadsperchild     => 32,
+    threadlimit         => 256,
+    threadsperchild     => 256,
     maxclients          => 4096,
     maxrequestsperchild => 5000,
     maxrequestworkers   => 4096,

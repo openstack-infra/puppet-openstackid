@@ -242,4 +242,6 @@ function site_update {
     # activate site
     rm -rf $SITE_ROOT/w
     ln -s $target_dir $SITE_ROOT/w
+    # to reset op cache
+    service php5-fpm restart
 }

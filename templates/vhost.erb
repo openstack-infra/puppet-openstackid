@@ -4,8 +4,6 @@
 
   ErrorLog ${APACHE_LOG_DIR}/openstackid-error.log
   LogLevel warn
-  CustomLog ${APACHE_LOG_DIR}/openstackid-access.log combined
-
   Redirect / https://<%= scope.lookupvar("openstackid::vhost_name") %>/
 
 </VirtualHost>
@@ -17,7 +15,6 @@
 
   ErrorLog ${APACHE_LOG_DIR}/openstackid-ssl-error.log
   LogLevel warn
-  CustomLog ${APACHE_LOG_DIR}/openstackid-ssl-access.log combined
 
   SSLEngine on
   SSLProtocol All -SSLv2 -SSLv3
