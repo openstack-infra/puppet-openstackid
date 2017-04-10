@@ -436,26 +436,29 @@ class openstackid (
   # system configuration tweaking
   $my_sysctl_settings = {
     # redis : http://redis.io/topics/admin
-    'vm.overcommit_memory'        => { value => 1 },
-    'net.core.rmem_default'       => { value => 31457280 },
-    'net.core.rmem_max'           => { value => 12582912 },
-    'net.core.wmem_default'       => { value => 31457280 },
-    'net.core.wmem_max'           => { value => 12582912 },
+    'vm.overcommit_memory'         => { value => 1 },
+    'net.core.rmem_default'        => { value => 31457280 },
+    'net.core.rmem_max'            => { value => 12582912 },
+    'net.core.wmem_default'        => { value => 31457280 },
+    'net.core.wmem_max'            => { value => 12582912 },
+    # Defines the size of the kernel queue for accepting new connections.
     # Increase number of incoming connections
-    'net.core.somaxconn'          => { value => 4096 },
+    'net.core.somaxconn'           => { value => 4096 },
     # Increase number of incoming connections backlog
-    'net.core.netdev_max_backlog' => { value => 65536 },
-    'net.core.optmem_max'         => { value => 25165824 },
-    'net.ipv4.tcp_mem'            => { value => "65536\t131072\t262144" },
-    'net.ipv4.udp_mem'            => { value => "65536\t131072\t262144" },
-    'net.ipv4.tcp_rmem'           => { value => "8192\t87380\t16777216" },
-    'net.ipv4.udp_rmem_min'       => { value => 16384 },
-    'net.ipv4.tcp_wmem'           => { value => "8192\t65536\t16777216" },
-    'net.ipv4.udp_wmem_min'       => { value => 16384 },
-    'net.ipv4.tcp_max_tw_buckets' => { value => 1440000 },
+    'net.core.netdev_max_backlog'  => { value => 65536 },
+    'net.core.optmem_max'          => { value => 25165824 },
+    # Defines the range of usable ports on your system.
+    'net.ipv4.ip_local_port_range' => { value => "10000\t65535"},
+    'net.ipv4.tcp_mem'             => { value => "65536\t131072\t262144" },
+    'net.ipv4.udp_mem'             => { value => "65536\t131072\t262144" },
+    'net.ipv4.tcp_rmem'            => { value => "8192\t87380\t16777216" },
+    'net.ipv4.udp_rmem_min'        => { value => 16384 },
+    'net.ipv4.tcp_wmem'            => { value => "8192\t65536\t16777216" },
+    'net.ipv4.udp_wmem_min'        => { value => 16384 },
+    'net.ipv4.tcp_max_tw_buckets'  => { value => 1440000 },
     # Increase the tcp-time-wait buckets pool size to prevent simple DOS attacks
-    'net.ipv4.tcp_tw_recycle'     => { value => 1 },
-    'net.ipv4.tcp_tw_reuse'       => { value => 1 },
+    'net.ipv4.tcp_tw_recycle'      => { value => 1 },
+    'net.ipv4.tcp_tw_reuse'        => { value => 1 },
   }
 
   $my_sysctl_defaults = {
