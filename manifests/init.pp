@@ -76,7 +76,15 @@ class openstackid (
   $assets_base_url = 'https://www.openstack.org/',
   $cache_driver = 'redis',
   $session_driver = 'redis',
-  $session_cookie_secure = false,
+  # on minutes
+  $session_lifetime = 1440,
+  $session_encrypt = true,
+  $session_expire_on_close = false,
+  $session_cookie_name = 'openstackid_s',
+  $session_cookie_path = '/',
+  $session_cookie_domain = $::fqdn,
+  $session_cookie_secure = true,
+  $session_cookie_http_only = true,
 ) {
 
   # php packages needed for openid server
