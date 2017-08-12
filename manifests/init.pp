@@ -474,4 +474,12 @@ class openstackid (
 
   create_resources(sysctl::value,$my_sysctl_settings,$my_sysctl_defaults)
 
+  cron { 'InstallLaravelSchedule':
+    ensure  => 'present',
+    command => 'su www-data -s /bin/bash -c "php /srv/openstackid/w/artisan schedule:run"',
+    user => 'root',
+    minute => '*',
+    require   => $deploy_site_requires,
+  }
+
 }
