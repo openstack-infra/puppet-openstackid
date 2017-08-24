@@ -157,8 +157,10 @@ class openstackid (
   }
 
   # the deploy scripts use the curl CLI
-  package { 'curl':
-    ensure => present,
+  if !defined(Package['curl']) {
+    package { 'curl':
+      ensure => present,
+    }
   }
 
   # install nodejs default version
