@@ -103,6 +103,16 @@ class openstackid (
     ensure => present,
   }
 
+  # binary packages needed
+
+  $bin_packages = [
+    'build-essential'
+  ]
+
+  package { $bin_packages :
+    ensure => present,
+  }
+
   # php5-fpm configuration
 
   exec { 'enable_php5-mbcrypt':
