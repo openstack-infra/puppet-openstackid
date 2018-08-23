@@ -85,6 +85,14 @@ class openstackid (
   $session_cookie_domain = $::fqdn,
   $session_cookie_secure = true,
   $session_cookie_http_only = true,
+  $mysql_ssl_enabled = false,
+  $mysql_ssl_ca_file = '/etc/mysql-client-ssl/ca-cert.pem',
+  $mysql_ssl_ca_file_contents = '',
+  $mysql_ssl_client_key_file = '/etc/mysql-client-ssl/client-key.pem',
+  $mysql_ssl_client_key_file_contents = '',
+  $mysql_ssl_client_cert_file = '/etc/mysql-client-ssl/client-cert.pem',
+  $mysql_ssl_client_cert_file_contents = '',
+  $mysql_ssl_cypher = 'DHE-RSA-AES256-SHA',
 ) {
 
   # php packages needed for openid server
@@ -289,6 +297,42 @@ class openstackid (
         require => [
           File['/etc/openstackid'],
         ]
+    }
+  }
+
+  # mysql ssl connection configuration
+  if($mysql_ssl_enabled) {
+
+    if $mysql_ssl_ca_file_contents != '' {
+      file { $mysql_ssl_ca_file:
+        owner   => 'root',
+        group   => 'www-data',
+        mode    => '0640',
+        content => $mysql_ssl_ca_file_contents,
+        notify  => Class['::apache::service'],
+        before  => Apache::Vhost::Custom[$vhost_name],
+      }
+    }
+
+    if $mysql_ssl_client_key_file_contents != '' {
+      file { $mysql_ssl_client_key_file:
+        owner   => 'root',
+        group   => 'www-data',
+        mode    => '0640',
+        content => $mysql_ssl_client_key_file_contents,
+        notify  => Class['::apache::service'],
+        before  => Apache::Vhost::Custom[$vhost_name],
+      }
+    }
+    if $mysql_ssl_client_cert_file_contents != '' {
+      file { $mysql_ssl_client_cert_file:
+        owner   => 'root',
+        group   => 'www-data',
+        mode    => '0640',
+        content => $mysql_ssl_client_cert_file_contents,
+        notify  => Class['::apache::service'],
+        before  => Apache::Vhost::Custom[$vhost_name],
+      }
     }
   }
 
