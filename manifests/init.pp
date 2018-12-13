@@ -85,9 +85,10 @@ class openstackid (
   $session_cookie_domain = $::fqdn,
   $session_cookie_secure = true,
   $session_cookie_http_only = true,
+  $php_version = 5,
 ) {
 
-  # php packages needed for openid server
+  # php5 packages needed for openid server
   $php5_packages = [
     'php5-common',
     'php5-curl',
@@ -99,71 +100,180 @@ class openstackid (
     'php5-gmp',
   ]
 
-  package { $php5_packages:
-    ensure => present,
-  }
+  # php7 packages needed for openid server
 
-  # binary packages needed
-
-  $bin_packages = [
-    'build-essential'
+  $php7_packages = [
+    'php7.2-common',
+    'php7.2-curl',
+    'php7.2-cli',
+    'php7.2-mysqlnd',
+    'php7.2-fpm',
+    'php7.2-json',
+    'php7.2-gmp',
+    'php7.2-xml',
+    'php7.2-zip',
   ]
 
-  package { $bin_packages :
-    ensure => present,
+  if($php_version == 7 ){
+    $php_service_name = 'php7.2-fpm'
+    $php_packages     = $php7_packages
+  }
+  else{
+    $php_service_name = 'php5-fpm'
+    $php_packages = $php5_packages
   }
 
-  # php5-fpm configuration
+  $main_packages = [
+    'curl',
+    'wget',
+    'build-essential',
+    'software-properties-common',
+    'python-software-properties',
+  ]
 
-  exec { 'enable_php5-mbcrypt':
-    command => '/usr/sbin/php5enmod mcrypt',
-    timeout => 0,
-    require => [
-      Package['php5-fpm'],
-    ],
-    notify  => Service['php5-fpm'],
-  }
-
-  file { '/etc/php5/fpm/php-fpm.conf':
+  package { $main_packages:
     ensure  => present,
-    owner   => 'root',
-    group   => 'www-data',
-    mode    => '0640',
-    source  => 'puppet:///modules/openstackid/php-fpm.conf',
     require => [
-      Package['php5-fpm'],
+      Class['apt:update']
     ],
-    notify  => Service['php5-fpm'],
   }
 
-  file { '/etc/php5/fpm/php.ini':
-    ensure  => present,
-    owner   => 'root',
-    group   => 'www-data',
-    mode    => '0640',
-    source  => 'puppet:///modules/openstackid/php.ini',
-    require => [
-      Package['php5-fpm'],
-    ],
-    notify  => Service['php5-fpm'],
+  if ($php_version == 7) {
+
+    if ($::lsbdistcodename == 'xenial') {
+
+      apt::ppa { 'ppa:ondrej/php': }
+
+      $php7_requires = [
+        Package[$main_packages],
+        Apt::Ppa['ppa:ondrej/php'],
+        Class['apt:update'],
+      ]
+
+    }
+    else{
+      $php7_requires = [
+        Package[$main_packages],
+      ]
+    }
+
+    package { $php7_packages:
+      ensure  => present,
+      require => $php7_requires,
+    }
+
+  }
+  else {
+
+    package { $php5_packages:
+      ensure  => present,
+      require => [
+        Package[$main_packages],
+      ],
+    }
+
   }
 
-  file { '/etc/php5/fpm/pool.d/www.conf':
-    ensure  => present,
-    owner   => 'root',
-    group   => 'www-data',
-    mode    => '0640',
-    source  => 'puppet:///modules/openstackid/www.conf',
-    require => [
-      Package['php5-fpm'],
-    ],
-    notify  => Service['php5-fpm'],
-  }
+  if ($php_version == 7) {
 
-  service { 'php5-fpm':
-    ensure  => 'running',
-    enable  => true,
-    require => Package['php5-fpm'],
+    # php7-fpm configuration
+
+    file { '/etc/php7.2/fpm/php-fpm.conf':
+      ensure  => present,
+      owner   => 'root',
+      group   => 'www-data',
+      mode    => '0640',
+      source  => 'puppet:///modules/openstackid/php7/php-fpm.conf',
+      require => [
+        Package[$php_service_name],
+      ],
+      notify  => Service[$php_service_name],
+    }
+
+    file { '/etc/php7.2/fpm/php.ini':
+      ensure  => present,
+      owner   => 'root',
+      group   => 'www-data',
+      mode    => '0640',
+      source  => 'puppet:///modules/openstackid/php7/php.ini',
+      require => [
+        Package[$php_service_name],
+      ],
+      notify  => Service[$php_service_name],
+    }
+
+    file { '/etc/php7.2/fpm/pool.d/www.conf':
+      ensure  => present,
+      owner   => 'root',
+      group   => 'www-data',
+      mode    => '0640',
+      source  => 'puppet:///modules/openstackid/php7/www.conf',
+      require => [
+        Package[$php_service_name],
+      ],
+      notify  => Service[$php_service_name],
+    }
+
+    service { $php_service_name:
+      ensure  => 'running',
+      enable  => true,
+      require => Package[$php_service_name],
+    }
+  }
+  else{
+
+    # php5-fpm configuration
+
+    exec { 'enable_php5-mbcrypt':
+      command => '/usr/sbin/php5enmod mcrypt',
+      timeout => 0,
+      require => [
+        Package[$php_service_name],
+      ],
+      notify  => Service[$php_service_name],
+    }
+
+    file { '/etc/php5/fpm/php-fpm.conf':
+      ensure  => present,
+      owner   => 'root',
+      group   => 'www-data',
+      mode    => '0640',
+      source  => 'puppet:///modules/openstackid/php-fpm.conf',
+      require => [
+        Package[$php_service_name],
+      ],
+      notify  => Service[$php_service_name],
+    }
+
+    file { '/etc/php5/fpm/php.ini':
+      ensure  => present,
+      owner   => 'root',
+      group   => 'www-data',
+      mode    => '0640',
+      source  => 'puppet:///modules/openstackid/php.ini',
+      require => [
+        Package[$php_service_name],
+      ],
+      notify  => Service[$php_service_name],
+    }
+
+    file { '/etc/php5/fpm/pool.d/www.conf':
+      ensure  => present,
+      owner   => 'root',
+      group   => 'www-data',
+      mode    => '0640',
+      source  => 'puppet:///modules/openstackid/www.conf',
+      require => [
+        Package[$php_service_name],
+      ],
+      notify  => Service[$php_service_name],
+    }
+
+    service { $php_service_name:
+      ensure  => 'running',
+      enable  => true,
+      require => Package[$php_service_name],
+    }
   }
 
   # the deploy scripts use the curl CLI
@@ -197,99 +307,15 @@ class openstackid (
     mode   => '0755',
   }
 
-  if($laravel_version == 4 ){
-
-      # laravel 4.X configuration files
-      file { '/etc/openstackid/database.php':
+  file { '/etc/openstackid/.env':
         ensure  => present,
-        content => template('openstackid/lv4/database.php.erb'),
+        content => template('openstackid/.env.erb'),
         owner   => 'root',
         group   => 'www-data',
         mode    => '0640',
         require => [
           File['/etc/openstackid'],
         ]
-      }
-
-      file { '/etc/openstackid/app.php':
-        ensure  => present,
-        content => template('openstackid/lv4/app.php.erb'),
-        owner   => 'root',
-        group   => 'www-data',
-        mode    => '0640',
-        require => [
-          File['/etc/openstackid'],
-        ]
-      }
-
-      file { '/etc/openstackid/log.php':
-        ensure  => present,
-        content => template('openstackid/lv4/log.php.erb'),
-        owner   => 'root',
-        group   => 'www-data',
-        mode    => '0640',
-        require => [
-          File['/etc/openstackid'],
-        ]
-      }
-
-      file { '/etc/openstackid/environment.php':
-        ensure  => present,
-        content => template('openstackid/lv4/environment.php.erb'),
-        owner   => 'root',
-        group   => 'www-data',
-        mode    => '0640',
-        require => [
-          File['/etc/openstackid'],
-        ]
-      }
-
-      file { '/etc/openstackid/recaptcha.php':
-        ensure  => present,
-        content => template('openstackid/lv4/recaptcha.php.erb'),
-        owner   => 'root',
-        group   => 'www-data',
-        mode    => '0640',
-        require => [
-          File['/etc/openstackid'],
-        ]
-      }
-
-      file { '/etc/openstackid/server.php':
-        ensure  => present,
-        content => template('openstackid/lv4/server.php.erb'),
-        owner   => 'root',
-        group   => 'www-data',
-        mode    => '0640',
-        require => [
-          File['/etc/openstackid'],
-        ]
-      }
-
-      file { '/etc/openstackid/mail.php':
-        ensure  => present,
-        content => template('openstackid/lv4/mail.php.erb'),
-        owner   => 'root',
-        group   => 'www-data',
-        mode    => '0640',
-        require => [
-          File['/etc/openstackid'],
-        ]
-      }
-
-  }
-  else
-  {
-      file { '/etc/openstackid/.env':
-        ensure  => present,
-        content => template('openstackid/lv5/.env.erb'),
-        owner   => 'root',
-        group   => 'www-data',
-        mode    => '0640',
-        require => [
-          File['/etc/openstackid'],
-        ]
-    }
   }
 
   $docroot_dirs = [ '/srv/openstackid' ]
@@ -389,53 +415,22 @@ class openstackid (
     require => Deploy['deploytool'],
   }
 
-  if($laravel_version == 4 ){
-
-    $deploy_site_requires =  [
-        File['/opt/deploy/conf.d/openstackid.conf'],
-        Apache::Vhost::Custom[$vhost_name],
-        File['/etc/openstackid/recaptcha.php'],
-        File['/etc/openstackid/database.php'],
-        File['/etc/openstackid/log.php'],
-        File['/etc/openstackid/environment.php'],
-        File['/etc/openstackid/server.php'],
-        File['/etc/openstackid/app.php'],
-        Package['curl'],
-        Package[$php5_packages] ,
-        Class['::nodejs'],
-    ]
-
-    $update_site_requires = [
-        File['/opt/deploy/conf.d/openstackid.conf'],
-        Apache::Vhost::Custom[$vhost_name],
-        File['/etc/openstackid/recaptcha.php'],
-        File['/etc/openstackid/database.php'],
-        File['/etc/openstackid/app.php'],
-        File['/etc/openstackid/log.php'],
-        File['/etc/openstackid/environment.php'],
-        File['/etc/openstackid/server.php'],
-        Package[$php5_packages] ,
-        Class['::nodejs'],
-    ]
-  }
-  else{
-    $deploy_site_requires =  [
+  $deploy_site_requires =  [
         File['/opt/deploy/conf.d/openstackid.conf'],
         Apache::Vhost::Custom[$vhost_name],
         File['/etc/openstackid/.env'],
         Package['curl'],
-        Package[$php5_packages] ,
+        Package[$php_packages] ,
         Class['::nodejs'],
-    ]
+  ]
 
-    $update_site_requires = [
-        File['/opt/deploy/conf.d/openstackid.conf'],
-        Apache::Vhost::Custom[$vhost_name],
-        File['/etc/openstackid/.env'],
-        Package[$php5_packages] ,
-        Class['::nodejs'],
-    ]
-  }
+  $update_site_requires = [
+    File['/opt/deploy/conf.d/openstackid.conf'],
+    Apache::Vhost::Custom[$vhost_name],
+    File['/etc/openstackid/.env'],
+    Package[$php_packages] ,
+    Class['::nodejs'],
+  ]
 
   exec { 'deploy-site':
     path      => '/usr/local/bin:/usr/bin:/bin',
