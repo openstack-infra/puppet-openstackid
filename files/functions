@@ -52,33 +52,14 @@ function site_init {
     umask 0022
     # link configuration files managed by puppet
 
-    if [[ $LARAVEL_VERSION -eq 4 ]]; then
-        ln -sf /etc/openstackid/environment.php $target_dir/bootstrap/environment.php
-        ln -sf /etc/openstackid/recaptcha.php $target_dir/app/config/packages/greggilbert/recaptcha/$LARAVEL_ENV/config.php
-        ln -sf /etc/openstackid/database.php $target_dir/app/config/$LARAVEL_ENV/database.php
-        ln -sf /etc/openstackid/app.php $target_dir/app/config/$LARAVEL_ENV/app.php
-        ln -sf /etc/openstackid/log.php $target_dir/app/config/$LARAVEL_ENV/log.php
-        ln -sf /etc/openstackid/server.php $target_dir/app/config/$LARAVEL_ENV/server.php
-        ln -sf /etc/openstackid/mail.php $target_dir/app/config/$LARAVEL_ENV/mail.php
-        # convert app/storage into symlink and set permissions
-        mv $target_dir/app/storage $SITE_ROOT/
-        chmod 02770 $SITE_ROOT/storage
-        find $SITE_ROOT/storage/ -type d -exec chmod 0775 {} \;
-        find $SITE_ROOT/storage/ -type f -exec chmod 0664 {} \;
-        rm -rf $target_dir/app/storage
-        ln -s $SITE_ROOT/storage $target_dir/app
-    fi
-
-    if [[ $LARAVEL_VERSION -eq 5 ]]; then
-       ln -sf /etc/openstackid/.env $target_dir/.env
-       # convert app/storage into symlink and set permissions
-       mv $target_dir/storage $SITE_ROOT/
-       chmod 02770 $SITE_ROOT/storage
-       find $SITE_ROOT/storage/ -type d -exec chmod 0775 {} \;
-       find $SITE_ROOT/storage/ -type f -exec chmod 0664 {} \;
-       rm -rf $target_dir/storage
-       ln -s $SITE_ROOT/storage $target_dir
-    fi
+    ln -sf /etc/openstackid/.env $target_dir/.env
+    # convert app/storage into symlink and set permissions
+    mv $target_dir/storage $SITE_ROOT/
+    chmod 02770 $SITE_ROOT/storage
+    find $SITE_ROOT/storage/ -type d -exec chmod 0775 {} \;
+    find $SITE_ROOT/storage/ -type f -exec chmod 0664 {} \;
+    rm -rf $target_dir/storage
+    ln -s $SITE_ROOT/storage $target_dir
 
     # populate application database
     cd $target_dir
@@ -190,40 +171,25 @@ function site_update {
     umask 0022
 
     # link configuration files managed by puppet
-    if [[ $LARAVEL_VERSION -eq 4 ]]; then
-        ln -sf /etc/openstackid/environment.php $target_dir/bootstrap/environment.php
-        ln -sf /etc/openstackid/recaptcha.php $target_dir/app/config/packages/greggilbert/recaptcha/$LARAVEL_ENV/config.php
-        ln -sf /etc/openstackid/database.php $target_dir/app/config/$LARAVEL_ENV/database.php
-        ln -sf /etc/openstackid/app.php $target_dir/app/config/$LARAVEL_ENV/app.php
-        ln -sf /etc/openstackid/log.php $target_dir/app/config/$LARAVEL_ENV/log.php
-        ln -sf /etc/openstackid/server.php $target_dir/app/config/$LARAVEL_ENV/server.php
-        ln -sf /etc/openstackid/mail.php $target_dir/app/config/$LARAVEL_ENV/mail.php
-        # link shared app/storage directory
-        rm -rf $target_dir/app/storage
-        ln -s $SITE_ROOT/storage $target_dir/app
+    ln -sf /etc/openstackid/.env $target_dir/.env
+    # link shared app/storage directory
+    rm -rf $target_dir/storage
+    ln -s $SITE_ROOT/storage $target_dir
+    # check for new storage structure ( LV 5.x)
+    if [[ ! -d $SITE_ROOT/storage/framework ]]; then
+        mkdir -p $SITE_ROOT/storage/framework;
+        mkdir -p $SITE_ROOT/storage/framework/cache;
+        mkdir -p $SITE_ROOT/storage/framework/views;
+        mkdir -p $SITE_ROOT/storage/framework/sessions;
     fi
-
-    if [[ $LARAVEL_VERSION -eq 5 ]]; then
-        ln -sf /etc/openstackid/.env $target_dir/.env
-        # link shared app/storage directory
-        rm -rf $target_dir/storage
-        ln -s $SITE_ROOT/storage $target_dir
-        # check for new storage structure ( LV 5.x)
-        if [[ ! -d $SITE_ROOT/storage/framework ]]; then
-           mkdir -p $SITE_ROOT/storage/framework;
-           mkdir -p $SITE_ROOT/storage/framework/cache;
-           mkdir -p $SITE_ROOT/storage/framework/views;
-           mkdir -p $SITE_ROOT/storage/framework/sessions;
-        fi
-        if [[ ! -d $SITE_ROOT/storage/app ]]; then
-           mkdir -p $SITE_ROOT/storage/app;
-           mkdir -p $SITE_ROOT/storage/app/public;
-        fi
-        # set permissions
-        chmod 02770 $SITE_ROOT/storage;
-        find $SITE_ROOT/storage/ -type d -exec chmod 0775 {} \;
-        find $SITE_ROOT/storage/ -type f -exec chmod 0664 {} \;
+    if [[ ! -d $SITE_ROOT/storage/app ]]; then
+        mkdir -p $SITE_ROOT/storage/app;
+        mkdir -p $SITE_ROOT/storage/app/public;
     fi
+    # set permissions
+    chmod 02770 $SITE_ROOT/storage;
+    find $SITE_ROOT/storage/ -type d -exec chmod 0775 {} \;
+    find $SITE_ROOT/storage/ -type f -exec chmod 0664 {} \;
 
     # populate application database
     cd $target_dir
@@ -235,5 +201,5 @@ function site_update {
     rm -rf $SITE_ROOT/w
     ln -s $target_dir $SITE_ROOT/w
     # to reset op cache
-    service php5-fpm restart
+    service $PHP_SERVICE_NAME restart
 }
