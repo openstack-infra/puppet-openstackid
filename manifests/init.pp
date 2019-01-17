@@ -448,7 +448,7 @@ class openstackid (
     mode   => '0755',
   }
 
-  deploy { 'deploytool':
+  openstackid::deploy { 'deploytool':
   }
 
   file { '/opt/deploy/conf.d/openstackid.conf':
