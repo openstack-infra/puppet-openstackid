@@ -448,7 +448,7 @@ class openstackid (
     mode   => '0755',
   }
 
-  deploy { 'deploytool':
+  openstackid::deploy { 'deploytool':
   }
 
   file { '/opt/deploy/conf.d/openstackid.conf':
@@ -456,7 +456,7 @@ class openstackid (
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-    require => Deploy['deploytool'],
+    require => openstackid::Deploy['deploytool'],
   }
 
   $deploy_site_requires =  [
