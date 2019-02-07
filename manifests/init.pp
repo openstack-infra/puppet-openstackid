@@ -137,6 +137,8 @@ class openstackid (
     'build-essential',
     'software-properties-common',
     'python-software-properties',
+    'nodejs',
+    'npm'
   ]
 
   package { $main_packages:
@@ -295,10 +297,6 @@ class openstackid (
     package { 'curl':
       ensure => present,
     }
-  }
-
-  # install nodejs default version
-  class { '::nodejs':
   }
 
   group { 'openstackid':
@@ -464,16 +462,14 @@ class openstackid (
         Apache::Vhost::Custom[$vhost_name],
         File['/etc/openstackid/.env'],
         Package['curl'],
-        Package[$php_packages] ,
-        Class['::nodejs'],
+        Package[$php_packages],
   ]
 
   $update_site_requires = [
     File['/opt/deploy/conf.d/openstackid.conf'],
     Apache::Vhost::Custom[$vhost_name],
     File['/etc/openstackid/.env'],
-    Package[$php_packages] ,
-    Class['::nodejs'],
+    Package[$php_packages],
   ]
 
   exec { 'deploy-site':
