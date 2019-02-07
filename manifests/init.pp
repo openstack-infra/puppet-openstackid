@@ -299,6 +299,7 @@ class openstackid (
 
   # install nodejs default version
   class { '::nodejs':
+    repo_url_suffix => '7.x',
   }
 
   group { 'openstackid':
@@ -322,14 +323,14 @@ class openstackid (
   }
 
   file { '/etc/openstackid/.env':
-        ensure  => present,
-        content => template('openstackid/.env.erb'),
-        owner   => 'root',
-        group   => 'www-data',
-        mode    => '0640',
-        require => [
-          File['/etc/openstackid'],
-        ]
+    ensure  => present,
+    content => template('openstackid/.env.erb'),
+    owner   => 'root',
+    group   => 'www-data',
+    mode    => '0640',
+    require => [
+      File['/etc/openstackid'],
+    ]
   }
 
   # mysql ssl connection configuration
@@ -460,12 +461,12 @@ class openstackid (
   }
 
   $deploy_site_requires =  [
-        File['/opt/deploy/conf.d/openstackid.conf'],
-        Apache::Vhost::Custom[$vhost_name],
-        File['/etc/openstackid/.env'],
-        Package['curl'],
-        Package[$php_packages] ,
-        Class['::nodejs'],
+    File['/opt/deploy/conf.d/openstackid.conf'],
+    Apache::Vhost::Custom[$vhost_name],
+    File['/etc/openstackid/.env'],
+    Package['curl'],
+    Package[$php_packages] ,
+    Class['::nodejs'],
   ]
 
   $update_site_requires = [
