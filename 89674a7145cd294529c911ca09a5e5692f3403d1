@@ -1,0 +1,10 @@
+Code-Review+1: sebastian marcet <smarcet@gmail.com>
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Workflow+1: Monty Taylor <mordred@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Mon, 11 Feb 2019 21:15:24 +0000
+Reviewed-on: https://review.openstack.org/636137
+Project: openstack-infra/puppet-openstackid
+Branch: refs/heads/master
