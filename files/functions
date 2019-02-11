@@ -53,8 +53,23 @@ function site_init {
     # link configuration files managed by puppet
 
     ln -sf /etc/openstackid/.env $target_dir/.env
+
     # convert app/storage into symlink and set permissions
     mv $target_dir/storage $SITE_ROOT/
+    # check for new storage structure ( LV 5.x)
+    if [[ ! -d $SITE_ROOT/storage/framework ]]; then
+        mkdir -p $SITE_ROOT/storage/framework;
+        mkdir -p $SITE_ROOT/storage/framework/cache;
+        mkdir -p $SITE_ROOT/storage/framework/views;
+        mkdir -p $SITE_ROOT/storage/framework/sessions;
+    fi
+    if [[ ! -d $SITE_ROOT/storage/app ]]; then
+        mkdir -p $SITE_ROOT/storage/app;
+        mkdir -p $SITE_ROOT/storage/app/public;
+    fi
+    if [[ ! -d $SITE_ROOT/storage/logs ]]; then
+        mkdir -p $SITE_ROOT/storage/logs;
+    fi
     chmod 02770 $SITE_ROOT/storage
     find $SITE_ROOT/storage/ -type d -exec chmod 0775 {} \;
     find $SITE_ROOT/storage/ -type f -exec chmod 0664 {} \;
@@ -68,9 +83,8 @@ function site_init {
         php artisan db:seed --env=$LARAVEL_ENV --force
     fi
 
-    update_node
-    npm install
-    npm run build
+    sudo npm install
+    sudo npm run build
     # activate site
     rm -rf $SITE_ROOT/w
     ln -s $SITE_ROOT/slot0 $SITE_ROOT/w
@@ -117,10 +131,6 @@ function catalog_get_version {
     echo $RELEASE_DATE
 }
 
-function update_node {
-    npm install -g n;
-    n latest;
-}
 
 function site_update {
     if [ ! $1 ]; then
@@ -186,6 +196,9 @@ function site_update {
         mkdir -p $SITE_ROOT/storage/app;
         mkdir -p $SITE_ROOT/storage/app/public;
     fi
+    if [[ ! -d $SITE_ROOT/storage/logs ]]; then
+        mkdir -p $SITE_ROOT/storage/logs;
+    fi
     # set permissions
     chmod 02770 $SITE_ROOT/storage;
     find $SITE_ROOT/storage/ -type d -exec chmod 0775 {} \;
@@ -194,9 +207,8 @@ function site_update {
     # populate application database
     cd $target_dir
     php artisan migrate --env=$LARAVEL_ENV --force
-    update_node
-    npm install
-    npm run build
+    sudo npm install
+    sudo npm run build
     # activate site
     rm -rf $SITE_ROOT/w
     ln -s $target_dir $SITE_ROOT/w
