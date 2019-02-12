@@ -70,6 +70,8 @@ function site_init {
     if [[ ! -d $SITE_ROOT/storage/logs ]]; then
         mkdir -p $SITE_ROOT/storage/logs;
     fi
+    # set permissions
+    chown -R $FILE_OWNER:$FILE_GROUP $SITE_ROOT/storage
     chmod 02770 $SITE_ROOT/storage
     find $SITE_ROOT/storage/ -type d -exec chmod 0775 {} \;
     find $SITE_ROOT/storage/ -type f -exec chmod 0664 {} \;
@@ -200,6 +202,7 @@ function site_update {
         mkdir -p $SITE_ROOT/storage/logs;
     fi
     # set permissions
+    chown -R $FILE_OWNER:$FILE_GROUP $SITE_ROOT/storage
     chmod 02770 $SITE_ROOT/storage;
     find $SITE_ROOT/storage/ -type d -exec chmod 0775 {} \;
     find $SITE_ROOT/storage/ -type f -exec chmod 0664 {} \;
