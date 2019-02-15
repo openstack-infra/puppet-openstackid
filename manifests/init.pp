@@ -336,35 +336,49 @@ class openstackid (
   # mysql ssl connection configuration
   if($mysql_ssl_enabled) {
 
+    file { '/etc/mysql-client-ssl':
+      ensure => 'directory',
+      owner  => 'root',
+      group  => 'www-data',
+      mode   => '0775',
+    }
+
     if $mysql_ssl_ca_file_contents != '' {
       file { $mysql_ssl_ca_file:
+        ensure  =>  file,
         owner   => 'root',
         group   => 'www-data',
         mode    => '0640',
         content => $mysql_ssl_ca_file_contents,
         notify  => Class['::apache::service'],
         before  => Apache::Vhost::Custom[$vhost_name],
+        require => File['/etc/mysql-client-ssl'],
       }
     }
 
     if $mysql_ssl_client_key_file_contents != '' {
       file { $mysql_ssl_client_key_file:
+        ensure  =>  file,
         owner   => 'root',
         group   => 'www-data',
         mode    => '0640',
         content => $mysql_ssl_client_key_file_contents,
         notify  => Class['::apache::service'],
         before  => Apache::Vhost::Custom[$vhost_name],
+        require => File['/etc/mysql-client-ssl'],
       }
     }
+
     if $mysql_ssl_client_cert_file_contents != '' {
       file { $mysql_ssl_client_cert_file:
+        ensure  =>  file,
         owner   => 'root',
         group   => 'www-data',
         mode    => '0640',
         content => $mysql_ssl_client_cert_file_contents,
         notify  => Class['::apache::service'],
         before  => Apache::Vhost::Custom[$vhost_name],
+        require => File['/etc/mysql-client-ssl'],
       }
     }
   }
