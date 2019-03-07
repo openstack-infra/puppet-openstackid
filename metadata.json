@@ -16,9 +16,9 @@
   ],
   "dependencies": [
     { "name": "puppetlabs/stdlib", "version_requirement": ">= 3.2.0" },
-    { "name": "puppetlabs/mysql", "version_requirement": "= 0.6.1" },
+    { "name": "puppetlabs/mysql", "version_requirement": ">= 0.6.1" },
     { "name": "puppetlabs/apache", "version_requirement": "= 1.8.1" },
-    { "name": "openstackinfra/redis", "version_requirement": "= 0.0.1" },
+    { "name": "openstackinfra/redis", "version_requirement": ">= 0.0.1" },
     { "name": "duritong/puppet-sysctl", "version_requirement": "= v0.0.11" }
   ]
 }
