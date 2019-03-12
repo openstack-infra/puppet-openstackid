@@ -1,0 +1,9 @@
+Code-Review+2: Colleen Murphy <colleen@gazlene.net>
+Code-Review+2: Jens Harbott (frickler) <j.harbott@x-ion.de>
+Workflow+1: Jens Harbott (frickler) <j.harbott@x-ion.de>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Tue, 12 Mar 2019 16:18:41 +0000
+Reviewed-on: https://review.openstack.org/641726
+Project: openstack-infra/puppet-openstackid
+Branch: refs/heads/master
