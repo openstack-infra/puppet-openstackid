@@ -299,7 +299,8 @@ class openstackid (
 
   # force 10.x version
   class { '::nodejs':
-    repo_url_suffix => '10.x',
+    repo_url_suffix        => '10.x',
+    legacy_debian_symlinks => false,
   }
 
   group { 'openstackid':
