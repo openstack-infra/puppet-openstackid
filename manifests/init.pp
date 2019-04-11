@@ -57,6 +57,7 @@ class openstackid (
   $app_version = '',
   $app_timezone = 'UTC',
   $email_driver = 'mail',
+  $email_send_grid_api_key = '',
   $email_smtp_server = 'smtp.mailgun.org',
   $email_smtp_server_port = 587,
   $email_smtp_server_user = '',
